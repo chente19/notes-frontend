@@ -21,29 +21,32 @@
             transition="scroll-y-reverse-transition"
             >No hay ninguna nota creada</v-alert
           >
+          <ul>
+            <template v-for="notesArray in notesArrays">
+              <br />
+              <v-container>
+                <v-card class="mx-auto" elevation="15">
+                  <v-card-text>
+                    <p class="text-h4 text--primary">
+                     {{ notesArray.title }}
+                    </p>
+                    <div class="text--primary">
+                      {{ notesArray.content }}
+                    </div>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-btn text color="deep-purple accent-4">
+                      Editar
+                    </v-btn>
+                    <v-btn text color="deep-purple accent-4">
+                      Borrar
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-container>
+            </template>
+          </ul>
         </v-card>
-        <br />
-        <v-container>
-          <v-card class="mx-auto" elevation="15">
-            <v-card-text>
-              <p class="text-h4 text--primary">
-                Titulo
-              </p>
-              <div class="text--primary">
-                Contenido.<br />
-                mas contenido
-              </div>
-            </v-card-text>
-            <v-card-actions>
-              <v-btn text color="deep-purple accent-4">
-                Editar
-              </v-btn>
-              <v-btn text color="deep-purple accent-4">
-                Borrar
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-container>
       </v-col>
     </v-row>
   </v-container>
@@ -55,9 +58,16 @@ export default {
   data() {
     return {
       showEmptyArray: true,
-      notesArray: [],
-      notesArraySize: 5,
+      notesArrays: [],
+      notesArraySize: 0,
       responsable_user: "",
+      items: [
+        { numero: 1 },
+        { numero: 2 },
+        { numero: 3 },
+        { numero: 4 },
+        { numero: 5 },
+      ],
     };
   },
   created() {
@@ -66,12 +76,12 @@ export default {
   },
   methods: {
     createNote() {
-      this.notesArray.forEach((element, index) => {
+      this.notesArrays.forEach((element, index) => {
         console.log(element);
       });
     },
     async checkList() {
-      if (this.notesArray.length > 0) {
+      if (this.notesArrays.length > 0) {
         this.showEmptyArray = false;
       } else {
         this.showEmptyArray = true;
@@ -81,8 +91,8 @@ export default {
       try {
         let counter = 0;
         let response = await axios.get(`task/list/${this.responsable_user}`);
-        this.notesArray = response.data;
-        this.notesArray.forEach((item) => {
+        this.notesArrays = response.data;
+        this.notesArrays.forEach((item) => {
           counter += 1;
         });
         this.notesArraySize = counter;
