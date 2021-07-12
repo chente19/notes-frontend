@@ -35,7 +35,11 @@
                     </div>
                   </v-card-text>
                   <v-card-actions>
-                    <v-btn text color="deep-purple accent-4">
+                    <v-btn
+                      text
+                      color="deep-purple accent-4"
+                      @click="updateNote(notesArray)"
+                    >
                       Editar
                     </v-btn>
                     <v-btn
@@ -194,15 +198,15 @@ export default {
   },
   data() {
     return {
-      showEmptyArray: true,
+      showEmptyArray: false,
       notesArrays: [],
       notesArraySize: 0,
       responsable_user: "",
+      currenTaskId: "",
       recordInterface: {
         title: "NA",
         content: "NA",
         responsable_user: "NA",
-        TASK_ID: "",
       },
       // vars about modal request
       correctForm: false,
@@ -231,10 +235,11 @@ export default {
     updateNote(aNote) {
       this.modalTitle = "Actualizar NOTA";
       this.isCreateNote = false;
-      this.correctForm;
-      this.recordInterface.title = aNote.title;
-      this.recordInterface.content = aNote.content;
-      this.recordInterface.responsable_user = aNote.TASK_ID;
+      this.correctForm = true;
+      this.recordInterface.responsable_user = this.responsable_user;
+      this.currenTaskId = aNote.TASK_ID;
+      this.takeTitle();
+      this.takeContent();
     },
     async checkList() {
       if (this.notesArrays.length > 0) {
@@ -304,6 +309,8 @@ export default {
         // Petición axios
         if (this.isCreateNote) {
           this.requestCreateNote();
+        } else {
+          this.requestUpdateNote();
         }
       } catch (e) {}
     },
@@ -316,7 +323,6 @@ export default {
         const theData = await backResponse.data;
         const numberValueString = await theData.new_task_id;
         this.newNumberRecordResponse = numberValueString;
-        this.recordInterface.TASK_ID = numberValueString;
         this.showSuccessRequest = true;
         this.showAcceptButton = true;
         this.showCancelButton = false;
@@ -325,7 +331,37 @@ export default {
         this.notesArrays.push(this.recordInterface);
       } catch (e) {
         console.error(e);
-        console.log(this.newRecordInterfaceRequest);
+        this.showSuccessRequest = false;
+        this.showCancelButton = false;
+        this.showErrorRequest = true;
+        this.showAcceptButton = true;
+      }
+    },
+    async requestUpdateNote() {
+      try {
+        const backResponse = await axios.put(
+          `task/update/${this.currenTaskId}`,
+          this.recordInterface
+        );
+        const theData = await backResponse.data;
+        const numberValueString = await theData.TASK_ID;
+        const theUpdatedTitle = await theData.title;
+        const theUpdatedContent = await theData.content;
+        this.newNumberRecordResponse = numberValueString;
+        let index = this.notesArrays.findIndex(
+          (obj) => obj.TASK_ID == numberValueString
+        );
+        this.notesArrays[index] = {
+          TASK_ID: numberValueString,
+          title: theUpdatedTitle,
+          content: theUpdatedContent,
+        };
+        this.showSuccessRequest = true;
+        this.showAcceptButton = true;
+        this.showCancelButton = false;
+        this.showSaveButton = false;
+      } catch (e) {
+        console.error(e);
         this.showSuccessRequest = false;
         this.showCancelButton = false;
         this.showErrorRequest = true;
@@ -343,9 +379,12 @@ export default {
           `task/deactivate/${theNote.TASK_ID}`,
           deleteInterface
         );
-        let index = this.notesArrays.findIndex(obj => obj.TASK_ID == theNote.TASK_ID);
+        let index = this.notesArrays.findIndex(
+          (obj) => obj.TASK_ID == theNote.TASK_ID
+        );
         this.notesArrays.splice(index, 1);
         alert(`La Nota con id ${theNote.TASK_ID} fue eliminada`);
+        this.checkList();
       } catch (e) {
         console.error(e);
       }

@@ -33,3 +33,9 @@ npm run build
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+## FIRST USER and PASSWORD
+
+`user number:` 1000
+`password:` 123456
