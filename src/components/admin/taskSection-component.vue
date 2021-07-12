@@ -92,6 +92,7 @@
                             <InputString
                               titleLabel="Escribe el titulo aqui"
                               @listenChildInputString="takeTitle"
+                              @click:clear="checkInputs"
                             ></InputString>
                             <div class="text-h4 text-center">
                               Contenido
@@ -99,6 +100,7 @@
                             <InputString
                               titleLabel="Escribe el contenido aqui"
                               @listenChildInputString="takeContent"
+                              @click:clear="checkInputs"
                             ></InputString>
                           </v-card-text>
                         </v-card>
@@ -128,8 +130,7 @@
                           dense
                           icon="mdi-check-circle"
                           transition="scroll-y-reverse-transition"
-                          >El usuario No. {{ this.responsable_user }}, Número
-                          creada o actuializada:
+                          >El usuario No. {{ this.responsable_user }}, id al {{ this.modalTitle }}:
                         </v-alert>
                         <br />
                         <v-alert
@@ -193,12 +194,10 @@ export default {
       notesArraySize: 0,
       responsable_user: "",
       recordInterface: {
-        title: "",
-        content: "",
-        responsable_user: "",
+        title: "NA",
+        content: "NA",
+        responsable_user: "NA",
       },
-      receivedTitle: "",
-      receivedContent: "",
       // vars about modal request
       correctForm: false,
       showCancelButton: true,
@@ -210,6 +209,7 @@ export default {
       showAcceptButton: false,
       showWarningForm: false,
       modalTitle: "",
+      isCreateNote: false,
     };
   },
   created() {
@@ -218,11 +218,17 @@ export default {
   },
   methods: {
     createNote() {
-      this.notesArrays.forEach((element, index) => {
-        console.log(element);
-      });
+      this.isCreateNote = true;
       this.modalTitle = "CREAR NOTA";
       this.correctForm = true;
+    },
+    updateNote(aNote) {
+      this.modalTitle = "Actualizar NOTA";
+      this.isCreateNote = false;
+      this.correctForm;
+      this.recordInterface.title = aNote.title;
+      this.recordInterface.content = aNote.content;
+      this.recordInterface.responsable_user = aNote.TASK_ID;
     },
     async checkList() {
       if (this.notesArrays.length > 0) {
@@ -252,18 +258,72 @@ export default {
     formValidation() {
       console.log("prueba");
     },
-    createNewRecordRequest() {
-      console.log("si funciona");
-    },
     rebootComponent() {
+      this.showSuccessRequest = false;
+      this.showCancelButton = true;
+      this.showErrorRequest = false;
+      this.showAcceptButton = true;
+      this.showAcceptButton = false;
+      this.showSaveButton = true;
       this.correctForm = false;
     },
     takeTitle(value) {
-      this.receivedTitle = value;
+      this.recordInterface.title = value;
+      this.checkInputs();
     },
     takeContent(value) {
-      this.receivedContent = value;
+      this.recordInterface.content = value;
+      this.checkInputs();
     },
+    checkInputs() {
+      try {
+        if (
+          this.recordInterface.title.length < 1 ||
+          this.recordInterface.title == null ||
+          this.recordInterface.content.length < 1 ||
+          this.recordInterface.content == null
+        ) {
+          this.showSaveButton = false;
+        } else {
+          this.showSaveButton = true;
+        }
+      } catch (e) {
+        this.showSaveButton = false;
+      }
+    },
+    createNewRecordRequest() {
+      try {
+        // take the responsable user
+        this.recordInterface.responsable_user = this.responsable_user;
+        // Petición axios
+        if(this.isCreateNote){
+          this.requestCreateNote();
+        }
+      } catch (e) {}
+    },
+    async requestCreateNote() {
+      try {
+         const backResponse = await axios.post(
+          "task/add/",
+          this.recordInterface
+        );
+        const theData = await backResponse.data;
+        const numberValueString = await theData.new_task_id;
+        this.newNumberRecordResponse = numberValueString;
+        this.showSuccessRequest = true;
+        this.showAcceptButton = true;
+        this.showCancelButton = false;
+        this.showSaveButton = false;
+      } catch (e) {
+        console.error(e);
+        console.log(this.newRecordInterfaceRequest);
+        this.showSuccessRequest = false;
+        this.showCancelButton = false;
+        this.showErrorRequest = true;
+        this.showAcceptButton = true;
+      }
+
+    }
   },
 };
 </script>
