@@ -197,6 +197,7 @@ export default {
         title: "NA",
         content: "NA",
         responsable_user: "NA",
+        TASK_ID: ""
       },
       // vars about modal request
       correctForm: false,
@@ -310,10 +311,13 @@ export default {
         const theData = await backResponse.data;
         const numberValueString = await theData.new_task_id;
         this.newNumberRecordResponse = numberValueString;
+        this.recordInterface.TASK_ID = numberValueString;
         this.showSuccessRequest = true;
         this.showAcceptButton = true;
         this.showCancelButton = false;
         this.showSaveButton = false;
+        // push the new note
+        this.notesArrays.push(this.recordInterface);
       } catch (e) {
         console.error(e);
         console.log(this.newRecordInterfaceRequest);
