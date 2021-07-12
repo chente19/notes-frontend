@@ -38,7 +38,11 @@
                     <v-btn text color="deep-purple accent-4">
                       Editar
                     </v-btn>
-                    <v-btn text color="deep-purple accent-4">
+                    <v-btn
+                      text
+                      color="deep-purple accent-4"
+                      @click="noteDelete(notesArray)"
+                    >
                       Borrar
                     </v-btn>
                   </v-card-actions>
@@ -130,7 +134,8 @@
                           dense
                           icon="mdi-check-circle"
                           transition="scroll-y-reverse-transition"
-                          >El usuario No. {{ this.responsable_user }}, id al {{ this.modalTitle }}:
+                          >El usuario No. {{ this.responsable_user }}, id al
+                          {{ this.modalTitle }}:
                         </v-alert>
                         <br />
                         <v-alert
@@ -197,7 +202,7 @@ export default {
         title: "NA",
         content: "NA",
         responsable_user: "NA",
-        TASK_ID: ""
+        TASK_ID: "",
       },
       // vars about modal request
       correctForm: false,
@@ -297,14 +302,14 @@ export default {
         // take the responsable user
         this.recordInterface.responsable_user = this.responsable_user;
         // Petición axios
-        if(this.isCreateNote){
+        if (this.isCreateNote) {
           this.requestCreateNote();
         }
       } catch (e) {}
     },
     async requestCreateNote() {
       try {
-         const backResponse = await axios.post(
+        const backResponse = await axios.post(
           "task/add/",
           this.recordInterface
         );
@@ -326,8 +331,25 @@ export default {
         this.showErrorRequest = true;
         this.showAcceptButton = true;
       }
-
-    }
+    },
+    async noteDelete(theNote) {
+      console.log("borrando nota --> " + theNote.TASK_ID);
+      console.log(this.responsable_user);
+      let deleteInterface = {
+        responsable_user: this.responsable_user,
+      };
+      try {
+        const backResponse = await axios.put(
+          `task/deactivate/${theNote.TASK_ID}`,
+          deleteInterface
+        );
+        let index = this.notesArrays.findIndex(obj => obj.TASK_ID == theNote.TASK_ID);
+        this.notesArrays.splice(index, 1);
+        alert(`La Nota con id ${theNote.TASK_ID} fue eliminada`);
+      } catch (e) {
+        console.error(e);
+      }
+    },
   },
 };
 </script>
