@@ -18,6 +18,13 @@ npm install
 ```
 npm run serve
 ```
++ If everything is `OK` check below message in terminal
+
+```bash
+App running at:
+- Local:   http://localhost:8080/
+
+```
 
 ### Compiles and minifies for production
 ```

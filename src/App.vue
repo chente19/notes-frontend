@@ -21,14 +21,14 @@
         <template v-if="checkAdmin">
           <v-list-group :value="false" prepend-icon="mdi-book-open">
             <template v-slot:activator>
-              <v-list-item-title>Notes</v-list-item-title>
+              <v-list-item-title>Notas</v-list-item-title>
             </template>
             <!-- List Notes -->
             <v-list-item :to="{ name: 'NotesArea' }">
               <v-list-item-action>
                 <v-icon color="blue">mdi-clipboard-edit-outline</v-icon>
               </v-list-item-action>
-              <v-list-item-title>List Notes</v-list-item-title>
+              <v-list-item-title>Listado</v-list-item-title>
             </v-list-item>
           </v-list-group>
         </template>
