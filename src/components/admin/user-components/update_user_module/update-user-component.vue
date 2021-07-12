@@ -326,7 +326,7 @@ export default {
       correctForm: false,
       showWarningForm: false,
       role: "",
-      typeRole: ["administrador", "operador_carga", "laboratorista"],
+      typeRole: ["admin"],
       userName: "",
       lastName1: "",
       lastName2: "",
